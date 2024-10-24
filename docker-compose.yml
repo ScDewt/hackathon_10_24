@@ -45,6 +45,7 @@ services:
       - "8080:8000"
     volumes:
       - /var/www/python_env:/app/src/utils_public/.env
+      - /var/www/python_env:/app/src/bot/.env
     depends_on:
       - postgresql
 
