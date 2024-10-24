@@ -14,14 +14,15 @@ type SourceManagerHandler struct {
 }
 
 type Source struct {
-	Token     string    `json:"token" db:"token"`
-	Source    string    `json:"source" db:"source"`
-	CreatedAt time.Time `json:"created_at" db:"created_at"`
+	Token     string    `json:"token"`
+	Source    string    `json:"source"`
+	CreatedAt time.Time `json:"created_at"`
 }
 type List struct {
-	Token       string   `json:"token" db:"token"`
-	Description string   `json:"description" db:"description"`
-	Sources     []Source `json:"sources,omitempty" db:"-"`
+	Token        string   `json:"token"`
+	Description  string   `json:"description"`
+	ScheduleTime string   `json:"schedule_time"`
+	Sources      []Source `json:"sources,omitempty"`
 }
 
 func NewSourceManagerHandler(conn *pgx.Conn) *SourceManagerHandler {
@@ -69,21 +70,28 @@ func (h *SourceManagerHandler) apiUpdateList(r *gin.Context) {
 		return
 	}
 
-	description := r.Query("description")
-
-	list, err := h.getList(r.Request.Context(), token)
+	list, err := h.getOrCreateList(r.Request.Context(), token)
 	if err != nil {
 		handleError(r, err)
 		return
 	}
 
-	if list == nil {
-		r.AbortWithStatus(http.StatusNotFound)
-		return
+	if description, exist := r.GetQuery("description"); exist {
+		err = h.updateListDescription(r.Request.Context(), token, description)
+		if err != nil {
+			handleError(r, err)
+			return
+		}
+		list.Description = description
 	}
-
-	err = h.updateListDescription(r.Request.Context(), token, description)
-	list.Description = description
+	if scheduleTime, exist := r.GetQuery("schedule_time"); exist {
+		err = h.updateListScheduleTime(r.Request.Context(), token, scheduleTime)
+		if err != nil {
+			handleError(r, err)
+			return
+		}
+		list.ScheduleTime = scheduleTime
+	}
 
 	r.JSON(http.StatusOK, list)
 }
@@ -140,7 +148,8 @@ func (h *SourceManagerHandler) apiDeleteSource(r *gin.Context) {
 
 func (h *SourceManagerHandler) getList(ctx context.Context, token string) (list *List, err error) {
 	list = &List{Token: token}
-	err = h.db.QueryRow(ctx, "SELECT token, description FROM lists WHERE token = $1", list.Token).Scan(&list.Token, &list.Description)
+	err = h.db.QueryRow(ctx, "SELECT token, description, schedule_list FROM lists WHERE token = $1", list.Token).
+		Scan(&list.Token, &list.Description, &list.ScheduleTime)
 	if errors.Is(err, pgx.ErrNoRows) {
 		return nil, nil
 	}
@@ -196,6 +205,12 @@ func (h *SourceManagerHandler) removeSourceFromList(ctx context.Context, token s
 
 func (h *SourceManagerHandler) updateListDescription(ctx context.Context, token string, description string) (err error) {
 	_, err = h.db.Exec(ctx, "UPDATE lists SET description = $1 WHERE token = $2", description, token)
+
+	return
+}
+
+func (h *SourceManagerHandler) updateListScheduleTime(ctx context.Context, token string, time string) (err error) {
+	_, err = h.db.Exec(ctx, "UPDATE lists SET schedule_time = $1 WHERE token = $2", time, token)
 
 	return
 }

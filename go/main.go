@@ -2,16 +2,25 @@ package main
 
 import (
 	"context"
+	"github.com/gin-contrib/cors"
+	"github.com/gin-gonic/gin"
+	"github.com/jackc/pgx/v4"
 	"healthcheck/source_manager"
 	"net/http"
 	"os"
-
-	"github.com/gin-gonic/gin"
-	"github.com/jackc/pgx/v4"
 )
 
 func main() {
 	r := gin.Default()
+
+	// Настройки CORS
+	r.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"*"},                            // Разрешенные домены
+		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE"}, // Разрешенные методы
+		AllowHeaders:     []string{"Origin", "Content-Type", "Accept"},
+		ExposeHeaders:    []string{"Content-Length"},
+		AllowCredentials: true,
+	}))
 
 	dsn := getEnv("DSN", "postgresql://hackathon:hackathon@postgresql:5432/hackathon")
 
