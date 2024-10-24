@@ -2,11 +2,12 @@ package main
 
 import (
 	"context"
-	"github.com/gin-gonic/gin"
-	"github.com/jackc/pgx/v4"
 	"healthcheck/source_manager"
 	"net/http"
 	"os"
+
+	"github.com/gin-gonic/gin"
+	"github.com/jackc/pgx/v4"
 )
 
 func main() {
