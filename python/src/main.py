@@ -7,7 +7,7 @@ from databases import Database
 
 import time
 
-from utils_modules.utils_logger import logging
+from .utils_modules.utils_logger import logging
 from utils_public.router import router_app
 
 
