@@ -10,7 +10,7 @@ import httpx
 import openai
 from fastapi import APIRouter, HTTPException, Depends
 
-from utils_modules.utils_logger import logging
+from src.utils_modules.utils_logger import logging
 from .utils_model import UtilsRequestModel, UtilsResponseModel
 from httpx_socks import AsyncProxyTransport
 
