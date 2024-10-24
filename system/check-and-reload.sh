@@ -20,7 +20,7 @@ NEW_COMMIT=$(git rev-parse HEAD)
 if [ "$LAST_COMMIT" != "$NEW_COMMIT" ]; then
     echo "Изменения найдены. Перезапуск Docker контейнеров..."
     docker-compose -f $DOCKER_COMPOSE_PATH pull
-    docker-compose -f $DOCKER_COMPOSE_PATH up -d --remove-orphans
+    docker-compose -f $DOCKER_COMPOSE_PATH up -d --build --remove-orphans
 else
     echo "Изменений нет. Контейнеры не будут перезапущены."
 fi
