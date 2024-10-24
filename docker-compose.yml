@@ -23,7 +23,7 @@ services:
     ports:
       - "80:80"
     volumes:
-      - ./nginx/index.html:/usr/share/nginx/html/index.html:ro  # Стартовая страница
+      - ./nginx:/usr/share/nginx/html:ro  # Стартовая страница
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
     networks:
       - default
