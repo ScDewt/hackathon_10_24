@@ -8,7 +8,7 @@ from databases import Database
 import time
 
 from .utils_modules.utils_logger import logging
-from utils_public.router import router_app
+from .utils_public.router import router_app
 
 
 DATABASE_URL = "postgresql://hackathon:hackathon@postgresql:5432/hackathon"
