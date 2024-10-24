@@ -148,7 +148,7 @@ func (h *SourceManagerHandler) apiDeleteSource(r *gin.Context) {
 
 func (h *SourceManagerHandler) getList(ctx context.Context, token string) (list *List, err error) {
 	list = &List{Token: token}
-	err = h.db.QueryRow(ctx, "SELECT token, description, schedule_list FROM lists WHERE token = $1", list.Token).
+	err = h.db.QueryRow(ctx, "SELECT token, description, schedule_time FROM lists WHERE token = $1", list.Token).
 		Scan(&list.Token, &list.Description, &list.ScheduleTime)
 	if errors.Is(err, pgx.ErrNoRows) {
 		return nil, nil
