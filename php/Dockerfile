@@ -1,27 +1,25 @@
-FROM php:8.1-fpm
+FROM php:8.3-cli
 
-# Устанавливаем необходимые зависимости
+# Устанавливаем необходимые зависимости для Symfony
 RUN apt-get update && apt-get install -y \
     libpq-dev \
     git \
-    unzip \
-    nginx
+    unzip
 
-# Устанавливаем расширения PHP
+# Устанавливаем PHP-расширения для PostgreSQL
 RUN docker-php-ext-install pdo pdo_pgsql
 
 # Установка Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Копируем файлы приложения
-WORKDIR /var/www/html
-COPY . .
+# Задаем рабочую директорию, которая будет использоваться для Symfony
+WORKDIR /var/www/symfony
 
-# Устанавливаем зависимости Symfony
-RUN composer install
+# Копируем файлы проекта Symfony в контейнер
+COPY ./symfony /var/www/symfony
 
-# Копируем конфигурацию Nginx
-COPY ./nginx/nginx.conf /etc/nginx/nginx.conf
+# Устанавливаем зависимости проекта Symfony
+RUN composer install --no-dev --optimize-autoloader
 
-# Команды для запуска PHP-FPM и Nginx
-CMD service nginx start && php-fpm
+# Команда для запуска встроенного PHP-сервера Symfony
+CMD php -S 0.0.0.0:8000 -t public
