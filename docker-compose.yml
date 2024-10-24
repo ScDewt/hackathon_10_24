@@ -24,7 +24,7 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - ./nginx:/usr/share/nginx/html:ro  # Стартовая страница
+      - ./nginx/public:/usr/share/nginx/html  # Стартовая страница
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf
       - /var/www/certs:/etc/letsencrypt
     networks:
@@ -45,6 +45,7 @@ services:
       - "8080:8000"
     volumes:
       - /var/www/python_env:/app/src/utils_public/.env
+      - /var/www/python_env:/app/src/bot/.env
     depends_on:
       - postgresql
 
